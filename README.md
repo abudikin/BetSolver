@@ -49,15 +49,4 @@ npm install
 
 4. Открыть [http://localhost:3000](http://localhost:3000) в браузере
 
-## Структура проекта
-/src
-/components # Переиспользуемые компоненты
-/pages # Страницы приложения
-/hooks # Кастомные хуки
-/store # Redux store
-/services # API и другие сервисы
-/styles # Глобальные стили
-/types # TypeScript типы
-/utils # Утилиты и хелперы
-
 
