@@ -19,7 +19,8 @@ BetSolver - это платформа для организации и отсл�
 ## Технологический стек
 
 ### Фронтенд
-- React/Next.js
+
+- React/Vite
 - Tailwind CSS
 - Redux Toolkit
 - React Query
@@ -28,6 +29,7 @@ BetSolver - это платформа для организации и отсл�
 - Framer Motion
 
 ### Бэкенд
+
 - NestJS
 - TypeScript
 - PostgreSQL
@@ -41,11 +43,9 @@ BetSolver - это платформа для организации и отсл�
 git clone https://github.com/abudikin/BetSolver
 
 2. Установить зависимости
-cd betsolver-frontend
-npm install
+   cd betsolver-frontend
+   npm install
 
 3. Запустить проект в режиме разработки
 
 4. Открыть [http://localhost:3000](http://localhost:3000) в браузере
-
-
