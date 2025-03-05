@@ -20,7 +20,6 @@ BetSolver - это платформа для организации и отсл�
 
 ### Фронтенд
 - React/Next.js
-- TypeScript
 - Tailwind CSS
 - Redux Toolkit
 - React Query
