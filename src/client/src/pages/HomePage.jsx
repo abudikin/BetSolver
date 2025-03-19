@@ -81,6 +81,18 @@ const HomePage = () => {
           >
             Начать спор
           </button>
+          <button
+            className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
+            onClick={() => navigate("/profile")}
+          >
+            Профиль
+          </button>
+          <button
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
+            onClick={() => navigate("/disputes")}
+          >
+            Список споров
+          </button>
         </motion.div>
       </div>
     </div>
