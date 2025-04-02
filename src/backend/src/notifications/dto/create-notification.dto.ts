@@ -1,3 +1,3 @@
 export class CreateNotificationDto {
-    message: string;
+    message?: string;
   }
