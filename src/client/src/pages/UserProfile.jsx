@@ -6,7 +6,7 @@ const UserProfile = () => {
   const navigate = useNavigate();
 
   const handleEditProfile = () => {
-    alert("Редактирование профиля пока не доступно!");
+    navigate("/edit");
   };
 
   return (
