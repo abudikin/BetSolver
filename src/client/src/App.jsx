@@ -5,6 +5,8 @@ import RegisterPage from "./pages/RegisterPage";
 import CreateDispute from "./pages/CreateDispute";
 import UserProfile from "./pages/UserProfile";
 import DisputesList from "./pages/DisputesList";
+import EditProfile from "./pages/EditProfile";
+import DisputeDetails from "./pages/DisputeDetails";
 
 function App() {
   return (
@@ -15,7 +17,9 @@ function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/disputes" element={<DisputesList />} />
+        <Route path="/dispute/:id" element={<DisputeDetails />} />
         <Route path="/create-dispute" element={<CreateDispute />} />
+        <Route path="/edit" element={<EditProfile />} />
       </Routes>
     </BrowserRouter>
   );

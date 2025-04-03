@@ -47,6 +47,7 @@ const DisputesList = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               className="bg-gray-800 bg-opacity-50 p-6 rounded-xl backdrop-blur-sm border border-gray-700 cursor-pointer hover:bg-opacity-75 transition"
+              onClick={() => navigate(`/dispute/${dispute.id}`)}
             >
               <h2 className="text-xl font-bold">{dispute.title}</h2>
               <p className="text-gray-400">Статус: {dispute.status}</p>
