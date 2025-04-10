@@ -40,7 +40,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-
+          
+      - name: List files
+        run: ls -la
+        
       - name: Install dependencies
         run: npm install
         working-directory: ../src/backend
