@@ -1,8 +1,8 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Notification } from 'src/entities/notification.entity';
-import { User } from 'src/entities/user.entity';
+import { Notification } from 'entities/notification.entity';
+import { User } from 'entities/user.entity';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 
 @Injectable()
