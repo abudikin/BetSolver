@@ -43,8 +43,8 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: ./BetSolver\src\backend
+        working-directory: ../src/backend
 
       - name: Run tests
         run: npm run test:ci
-        working-directory: ./BetSolver\src\backend
+        working-directory: ../src/backend
