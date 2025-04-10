@@ -1,3 +1,4 @@
 export class CreateNotificationDto {
-    message: string;
+    message?: string;
+  isRead?: boolean;
   }

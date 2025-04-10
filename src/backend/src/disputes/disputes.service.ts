@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 
 /*import { Dispute } from './entities/dispute.entity';*/
 /*import { DisputeParticipant } from './entities/dispute-participant.entity';
@@ -49,14 +49,14 @@ export class DisputesService {
     return this.disputesRepository.find({ relations: ['creator', 'participants', 'evidence'] });
   }
 
-  async findOne(id: number): Promise<Dispute> {
+  async findOne(id: number): Promise<Dispute | null> {
     return this.disputesRepository.findOne({
       where: { id },
       relations: ['creator', 'participants', 'evidence'],
     });
   }
 
-  async update(id: number, updateDisputeDto: UpdateDisputeDto): Promise<Dispute> {
+  async update(id: number, updateDisputeDto: UpdateDisputeDto): Promise<Dispute| null> {
     await this.disputesRepository.update(id, updateDisputeDto);
     return this.disputesRepository.findOne({ where: { id } });
   }
@@ -69,9 +69,13 @@ export class DisputesService {
     const dispute = await this.disputesRepository.findOne({ where: { id: disputeId } });
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     
+    if (!dispute ) {
+      throw new NotFoundException(`User with ID ${disputeId} not found`);
+    }
+
     const participant = this.participantsRepository.create({
-      dispute,
-      user,
+      dispute: dispute as DeepPartial<Dispute>,
+      user: user as DeepPartial<User>,
       role,
     });
     
@@ -80,6 +84,9 @@ export class DisputesService {
 
   async addEvidence(disputeId: number, addEvidenceDto: AddEvidenceDto): Promise<Evidence> {
     const dispute = await this.disputesRepository.findOne({ where: { id: disputeId } });
+    if (!dispute ) {
+      throw new NotFoundException(`User with ID ${disputeId} not found`);
+    }
     const evidence = this.evidenceRepository.create({
       ...addEvidenceDto,
       dispute,
@@ -92,7 +99,11 @@ export class DisputesService {
       where: { id: disputeId },
       relations: ['participants'],
     });
+    if (!dispute) {
+      throw new NotFoundException(`User with ID ${disputeId} not found`);
+    }
 
+  
     // Update dispute status
     dispute.status = 'completed';
     await this.disputesRepository.save(dispute);
@@ -100,6 +111,11 @@ export class DisputesService {
     // Update user statistics
     for (const participant of dispute.participants) {
       const user = await this.usersRepository.findOne({ where: { id: participant.user.id } });
+      
+      if (!user ) {
+        throw new NotFoundException(`User with ID ${disputeId} not found`);
+      }
+
       if (user.id === winnerId) {
         user.wins += 1;
       } else {

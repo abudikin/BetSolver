@@ -6,35 +6,35 @@ import { Evidence } from './evidence.entity';
 @Entity()
 export class Dispute {
   @PrimaryGeneratedColumn()
-  id : number ; 
+  id !: number ; 
 
   @Column()
-  title : string  
+  title !: string  
 
   @Column()
-  description : string  
+  description !: string  
 
   @Column()
-  stake : string   // Условия спора (например, "Кто проиграет, тот платит обед")
+  stake !: string   // Условия спора (например, "Кто проиграет, тот платит обед")
 
   @Column({ default : 'pending' })
-  status : 'pending' | 'active' | 'completed'   // Статус спора
+  status !: 'pending' | 'active' | 'completed'   // Статус спора
 
   @CreateDateColumn()
-  createdAt : Date  
+  createdAt !: Date  
 
   @UpdateDateColumn()
-  updatedAt : Date  
+  updatedAt !: Date  
 
   @Column({ nullable : true })
-  deadline : Date   // Таймер для спора
+  deadline !: Date   // Таймер для спора
 
   @ManyToOne(() => User, (user) => user.createdDisputes)
-  creator : User  
+  creator !: User  
 
   @OneToMany(() => DisputeParticipant, (participant) => participant.dispute)
-  participants : DisputeParticipant[]  
+  participants !: DisputeParticipant[]  
 
   @OneToMany(() => Evidence, (evidence) => evidence.dispute)
-  evidence : Evidence[]  
+  evidence !: Evidence[]  
 }
