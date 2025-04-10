@@ -8,10 +8,10 @@ import { DeepPartial, Repository } from 'typeorm';
 /*import { User } from '../shared/entities/user.entity';*/
 
 
-import { Dispute } from 'src/entities/dispute.entity';
-import { DisputeParticipant } from 'src/entities/disputeparticipant.entity';
-import { Evidence } from 'src/entities/evidence.entity';
-import { User } from 'src/entities/user.entity';
+import { Dispute } from 'entities/dispute.entity';
+import { DisputeParticipant } from 'entities/disputeparticipant.entity';
+import { Evidence } from 'entities/evidence.entity';
+import { User } from 'entities/user.entity';
 
 import { CreateDisputeDto } from './dto/create-dispute.dto';
 import { UpdateDisputeDto } from './dto/update-dispute.dto';
