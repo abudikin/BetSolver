@@ -6,33 +6,34 @@ import { Notification } from './notification.entity';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id!: number  
+  id: number;
 
   @Column({ unique: true })
-  email!: string  
+  email: string;
 
   @Column()
-  password!: string  
+  password: string;
 
   @Column()
-  username!: string  
+  username: string;
 
   @Column({ default: 0 })
-  reputation!: number  
+  reputation: number = 0;
 
   @Column({ default: 0 })
-  wins!: number  
+  wins: number = 0;
 
   @Column({ default: 0 })
-  losses!: number  
+  losses: number = 0;
 
   @OneToMany(() => Dispute, (dispute) => dispute.creator)
-  createdDisputes!: Dispute[]  
+  createdDisputes: Dispute[] = [];
 
   @OneToMany(() => DisputeParticipant, (participant) => participant.user)
-  disputes!: DisputeParticipant[]  
+  disputes: DisputeParticipant[] = [];
 
   @OneToMany(() => Notification, (notification) => notification.user)
-  notifications!: Notification[]  
-    statistic: any;
+  notifications: Notification[] = [];
+
+  statistic: any = null; // Явно указываем null, если поле может быть пустым
 }
