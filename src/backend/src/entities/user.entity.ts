@@ -18,22 +18,23 @@ export class User {
   username: string;
 
   @Column({ default: 0 })
-  reputation: number = 0;
+  reputation: number;
 
   @Column({ default: 0 })
-  wins: number = 0;
+  wins: number;
 
   @Column({ default: 0 })
-  losses: number = 0;
+  losses: number;
 
   @OneToMany(() => Dispute, (dispute) => dispute.creator)
-  createdDisputes: Dispute[] = [];
+  createdDisputes: Dispute[];
 
   @OneToMany(() => DisputeParticipant, (participant) => participant.user)
-  disputes: DisputeParticipant[] = [];
+  disputes: DisputeParticipant[];
 
   @OneToMany(() => Notification, (notification) => notification.user)
-  notifications: Notification[] = [];
+  notifications: Notification[];
 
-  statistic: any = null; // Явно указываем null, если поле может быть пустым
+  // Это обычное поле, TypeORM не управляет им, но лучше не инициализировать прямо здесь
+  statistic: any;
 }

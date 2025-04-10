@@ -9,9 +9,38 @@ const RegisterPage = () => {
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
-  const onSubmit = (data) => {
-    console.log("Register Data:", data);
-    navigate("/home");
+
+  const onSubmit = async (data) => {
+    try {
+      console.log("Register Data:", data);
+
+      // Отправка данных на сервер
+      const response = await fetch("http://localhost:3000/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          username: data.name, // передаем имя как username
+        }),
+      });
+
+      // Проверка успешного ответа
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Registration successful:", result);
+        navigate("/");
+      } else {
+        const error = await response.json();
+        console.log("Registration error:", error);
+        // здесь можно вывести сообщение об ошибке
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      // обработка ошибок сети
+    }
   };
 
   return (
@@ -73,7 +102,7 @@ const RegisterPage = () => {
 
         <p className="mt-4 text-sm text-center">
           Уже есть аккаунт?{" "}
-          <Link to="/login" className="text-blue-400 hover:underline">
+          <Link to="/" className="text-blue-400 hover:underline">
             Войти
           </Link>
         </p>
