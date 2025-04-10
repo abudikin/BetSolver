@@ -10,10 +10,34 @@ const LoginPage = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    navigate("/home");
-    console.log("Login Data:", data);
+  const onSubmit = async (data) => {
+    try {
+      const response = await fetch("http://localhost:3000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Ошибка авторизации");
+      }
+  
+      const result = await response.json();
+      console.log("Login success:", result);
+  
+      // Сохраняем токен
+      localStorage.setItem("token", result.access_token);
+      localStorage.setItem("user_id", result.user_id);
+      // Переход на главную
+      navigate("/home");
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Неверный email или пароль");
+    }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
