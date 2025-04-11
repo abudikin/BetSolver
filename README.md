@@ -24,7 +24,6 @@ BetSolver - это платформа для организации и отсл�
 - Tailwind CSS
 - Redux Toolkit
 - React Query
-- Socket.io-client
 - React Hook Form
 - Framer Motion
 
@@ -33,8 +32,6 @@ BetSolver - это платформа для организации и отсл�
 - NestJS
 - TypeScript
 - PostgreSQL
-- Redis
-- WebSockets
 
 ## Установка и запуск
 
