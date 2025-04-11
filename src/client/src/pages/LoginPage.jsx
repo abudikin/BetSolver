@@ -1,9 +1,12 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setUser } from "../store/index"; // Экшен для установки данных пользователя
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -19,25 +22,27 @@ const LoginPage = () => {
         },
         body: JSON.stringify(data),
       });
-  
+
       if (!response.ok) {
         throw new Error("Ошибка авторизации");
       }
-  
+
       const result = await response.json();
       console.log("Login success:", result);
-  
-      // Сохраняем токен
-      localStorage.setItem("token", result.access_token);
-      localStorage.setItem("user_id", result.user_id);
-      // Переход на главную
+
+      // Сохраняем данные пользователя в Redux
+      dispatch(setUser({
+        token: result.access_token,
+        userId: result.user_id,
+      }));
+
+      // Переход на главную страницу
       navigate("/home");
     } catch (error) {
       console.error("Login error:", error);
       alert("Неверный email или пароль");
     }
   };
-  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
@@ -53,9 +58,7 @@ const LoginPage = () => {
               className="w-full p-2 mt-1 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             {errors.email && (
-              <p className="text-red-400 text-sm mt-1">
-                {errors.email.message}
-              </p>
+              <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>
             )}
           </div>
 
@@ -70,9 +73,7 @@ const LoginPage = () => {
               className="w-full p-2 mt-1 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             {errors.password && (
-              <p className="text-red-400 text-sm mt-1">
-                {errors.password.message}
-              </p>
+              <p className="text-red-400 text-sm mt-1">{errors.password.message}</p>
             )}
           </div>
 
