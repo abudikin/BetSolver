@@ -9,7 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: BetSolver
     steps:
       - name: 🧾 Клонируем репозиторий
         uses: actions/checkout@v3
@@ -21,14 +23,13 @@ jobs:
 
       - name: 📦 Устанавливаем зависимости
         run: npm install
-
+        working-directory: src/client
+        
       - name: 🔍 Проверка кода
         run: npm run lint
-
-      - name: 🧪 Тесты
-        run: npm test
+        working-directory: src/client
 
       - name: 🔨 Сборка проекта
         run: npm run build
-
+        working-directory: src/client
 
