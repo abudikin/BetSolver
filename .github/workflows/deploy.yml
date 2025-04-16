@@ -1,45 +1,27 @@
-name: Docker Deploy to Beget
+name: CI/CD for Vite + React with Docker
 
 on:
   push:
     branches: [main]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Клонируем репозиторий
-      - name: 🏷️ Checkout code
-        uses: actions/checkout@v4
+      - name: 🔽 Клонируем репозиторий
+        uses: actions/checkout@v3
 
-      # 2. Собираем Docker-образ
-      - name: 🐳 Build Docker image
-        run: |
-          cd src/client
-          docker build -t betsolver-client:latest .
-
-      # 3. Сохраняем образ в .tar (чтобы передать на сервер)
-      - name: 💾 Save Docker image
-        run: |
-          cd src/client
-          docker save -o betsolver-client.tar betsolver-client:latest
-          ls -lh
-
-      # 4. Настраиваем SSH-ключ для Beget
-      - name: 🔑 Add SSH key
-        uses: shimataro/ssh-key-action@v2
+      - name: 🔧 Логинимся в сервер через SSH и деплоим
+        uses: appleboy/ssh-action@v1.0.0
         with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      # 5. Копируем образ на сервер и запускаем
-      - name: 🚀 Deploy to Beget
-        run: |
-          scp -o StrictHostKeyChecking=no src/client/betsolver-client.tar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            docker load -i /tmp/betsolver-client.tar
-            docker stop betsolver-client || true
-            docker rm betsolver-client || true
-            docker run -d --name betsolver-client -p 3000:80 betsolver-client:latest
-            rm /tmp/betsolver-client.tar
-          "
+          script: |
+            cd /home/user/app-folder
+            git pull origin main
+            docker stop client || true
+            docker rm client || true
+            docker rmi client:latest || true
+            docker build -t client:latest .
+            docker run -d --name client -p 80:80 client:latest
