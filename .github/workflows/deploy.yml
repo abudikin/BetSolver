@@ -3,57 +3,53 @@ name: CI/CD for Vite + React
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: BetSolver
     steps:
-      - name: 🧹 Очистка
+      - name: 🏗️ Checkout repository
         uses: actions/checkout@v3
 
-      - name: 🟢 Установка Node.js
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '22'
 
-      - name: 📦 Установка зависимостей
+      - name: 📦 Install dependencies
         run: npm install
-        working-directory: src/client
+        working-directory: ./src/client
         
-      - name: 🔍 Проверка кода
+      - name: 🔍 Lint
         run: npm run lint
-        working-directory: src/client
+        working-directory: ./src/client
 
-      - name: 🔨 Сборка проекта
+      - name: 🔨 Build project
         run: npm run build
-        working-directory: src/client
+        working-directory: ./src/client
 
-      - name: 🐳 Сборка Docker образа
-        run: docker build -t betsolver-client .
-        working-directory: src/client
+      - name: 🐳 Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-      - name: 📦 Сохранение образа
-        run: docker save -o client-image.tar betsolver-client
+      - name: 🐳 Build and push Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/betsolver-client:latest ./src/client
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/betsolver-client:latest
 
-      - name: 🔒 Установка SSH ключа
+      - name: 🔒 Setup SSH
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
-      - name: 🚀 Деплой на сервер
+      - name: 🚀 Deploy to server
         run: |
-          scp -o StrictHostKeyChecking=no client-image.tar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            docker load -i /tmp/client-image.tar
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/betsolver-client:latest
             docker stop betsolver-client || true
             docker rm betsolver-client || true
-            docker run -d --name betsolver-client -p 3000:80 betsolver-client
-            rm /tmp/client-image.tar
+            docker run -d --name betsolver-client -p 3000:80 ${{ secrets.DOCKER_HUB_USERNAME }}/betsolver-client:latest
           "
-        working-directory: src/client
