@@ -1,27 +1,35 @@
-name: CI/CD for Vite + React with Docker
+name: CI/CD for Vite + React
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: BetSolver
     steps:
-      - name: 🔽 Клонируем репозиторий
+      - name: 🧾 Клонируем репозиторий
         uses: actions/checkout@v3
 
-      - name: 🔧 Логинимся в сервер через SSH и деплоим
-        uses: appleboy/ssh-action@v1.0.0
+      - name: 🟢 Устанавливаем Node.js
+        uses: actions/setup-node@v3
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /home/user/app-folder
-            git pull origin main
-            docker stop client || true
-            docker rm client || true
-            docker rmi client:latest || true
-            docker build -t client:latest .
-            docker run -d --name client -p 80:80 client:latest
+          node-version: '22'
+
+      - name: 📦 Устанавливаем зависимости
+        run: npm install
+        working-directory: src/client
+        
+      - name: 🔍 Проверка кода
+        run: npm run lint
+        working-directory: src/client
+
+      - name: 🔨 Сборка проекта
+        run: npm run build
+        working-directory: src/client
+
