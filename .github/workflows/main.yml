@@ -1,8 +1,12 @@
-name: Build, Test and Deploy
+name: Build, Test and Deploy Nest.js to Beget
 
 on:
   push:
     branches: [main]
+    paths:
+      - 'src/backend/**'
+      - '.github/workflows/deploy.yml'
+      - 'docker-compose.yml'
 
 jobs:
   build-and-test:
@@ -24,44 +28,51 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v3
-      
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'npm'
           
       - name: Install dependencies
+        working-directory: ./src/backend
         run: npm ci
           
       - name: Run tests
+        working-directory: ./src/backend
         run: npm run test
           
       - name: Build Docker image
+        working-directory: ./src/backend
         run: |
-          docker build -t nestjs-app .
-          docker save nestjs-app -o nestjs-app.tar
+          docker build -t nestjs-backend .
+          docker save nestjs-backend -o nestjs-backend.tar
           
       - name: Upload Docker image
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: docker-image
-          path: nestjs-app.tar
-          if-no-files-found: error
+          name: backend-image
+          path: src/backend/nestjs-backend.tar
           retention-days: 1
 
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Download Docker image
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: docker-image
+          name: backend-image
           path: .
           
       - name: Load Docker image
-        run: docker load -i nestjs-app.tar
+        run: docker load -i src/backend/nestjs-backend.tar
           
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
@@ -69,14 +80,21 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
           
+      - name: Prepare deployment files
+        run: |
+          mkdir -p deploy
+          cp docker-compose.yml deploy/
+          cp -r src/backend/.env* deploy/ || echo "No .env files found"
+          
       - name: Copy files to server
         run: |
-          scp -r docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/app/
+          scp -r deploy/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/app/
           
       - name: Deploy application
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
             cd /home/${{ secrets.SSH_USER }}/app &&
             docker-compose down &&
-            docker-compose up -d --build
+            docker-compose pull &&
+            docker-compose up -d
           "
