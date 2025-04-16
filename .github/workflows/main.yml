@@ -7,7 +7,6 @@ on:
       - 'src/backend/**'
       - '.github/workflows/deploy.yml'
       - 'docker-compose.yml'
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
