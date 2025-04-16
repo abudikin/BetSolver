@@ -30,14 +30,13 @@ jobs:
       - name: 🔑 Add SSH key
         uses: shimataro/ssh-key-action@v2
         with:
-          key: ${{ secrets.BEGET_SSH_KEY }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       # 5. Копируем образ на сервер и запускаем
       - name: 🚀 Deploy to Beget
         run: |
-          scp -o StrictHostKeyChecking=no src/client/betsolver-client.tar ${{ secrets.BEGET_USER }}@${{ secrets.BEGET_HOST }}:/tmp/
-          ssh -o StrictHostKeyChecking=no ${{ secrets.BEGET_USER }}@${{ secrets.BEGET_HOST }} "
+          scp -o StrictHostKeyChecking=no src/client/betsolver-client.tar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
             docker load -i /tmp/betsolver-client.tar
             docker stop betsolver-client || true
             docker rm betsolver-client || true
