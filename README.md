@@ -22,8 +22,6 @@ BetSolver - это платформа для организации и отсл�
 
 - React/Vite
 - Tailwind CSS
-- Redux Toolkit
-- React Query
 - React Hook Form
 - Framer Motion
 
