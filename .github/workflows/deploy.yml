@@ -1,0 +1,35 @@
+name: CI/CD for Vite + React
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: BetSolver
+    steps:
+      - name: 🧾 Клонируем репозиторий
+        uses: actions/checkout@v3
+
+      - name: 🟢 Устанавливаем Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: 📦 Устанавливаем зависимости
+        run: npm install
+        working-directory: src/client
+        
+      - name: 🔍 Проверка кода
+        run: npm run lint
+        working-directory: src/client
+
+      - name: 🔨 Сборка проекта
+        run: npm run build
+        working-directory: src/client
+

@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../store"; 
 import axios from "axios";
 
 const UserProfile = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch(); 
+
+  const { token, userId } = useSelector((state) => state.user);
+
   const [user, setUser] = useState(null);
-  const userId = localStorage.getItem("user_id");
-  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -32,6 +36,12 @@ const UserProfile = () => {
     navigate("/edit");
   };
 
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/"); 
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center text-white">
@@ -48,21 +58,10 @@ const UserProfile = () => {
         transition={{ duration: 0.5 }}
         className="bg-gray-800 bg-opacity-50 p-8 rounded-xl shadow-lg backdrop-blur-sm border border-gray-700 text-center"
       >
-        {/* Аватар
-        <motion.img
-          src={user.avatarUrl || "https://via.placeholder.com/150"}
-          alt="User Avatar"
-          className="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-blue-500"
-          initial={{ scale: 0.8 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        /> */}
 
-        {/* Информация о пользователе */}
         <h2 className="text-2xl font-bold">{user.name}</h2>
         <p className="text-gray-300">{user.email}</p>
 
-        {/* Статистика */}
         <div className="mt-4 grid grid-cols-3 gap-4">
           <div className="text-center">
             <span className="text-xl font-bold">{user.disputes.length}</span>
@@ -78,7 +77,6 @@ const UserProfile = () => {
           </div>
         </div>
 
-        {/* Кнопка редактирования */}
         <div className="flex flex-col items-start gap-4 mt-6">
           <motion.button
             className="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full transition-all duration-300 transform hover:scale-105"
@@ -88,7 +86,14 @@ const UserProfile = () => {
             Редактировать профиль
           </motion.button>
 
-          {/* Кнопка назад */}
+          <motion.button
+            className="mt-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-full transition-all duration-300 transform hover:scale-105"
+            onClick={handleLogout}
+            whileHover={{ scale: 1.1 }}
+          >
+            Выйти
+          </motion.button>
+
           <button
             className="mt-4 text-gray-400 hover:text-white transition-all"
             onClick={() => navigate(-1)}
