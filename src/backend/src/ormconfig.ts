@@ -1,7 +1,6 @@
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 dotenv.config();
-
 export default new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST,
@@ -11,5 +10,5 @@ export default new DataSource({
   database: process.env.DB_NAME,
   entities: ['dist/**/*.entity.js'],
   migrations: ['dist/migrations/*.js'],
-  synchronize: false,
+  synchronize: true,
 });

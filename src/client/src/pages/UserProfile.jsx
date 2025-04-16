@@ -48,7 +48,7 @@ const UserProfile = () => {
         transition={{ duration: 0.5 }}
         className="bg-gray-800 bg-opacity-50 p-8 rounded-xl shadow-lg backdrop-blur-sm border border-gray-700 text-center"
       >
-        {/* Аватар */}
+        {/* Аватар
         <motion.img
           src={user.avatarUrl || "https://via.placeholder.com/150"}
           alt="User Avatar"
@@ -56,7 +56,7 @@ const UserProfile = () => {
           initial={{ scale: 0.8 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-        />
+        /> */}
 
         {/* Информация о пользователе */}
         <h2 className="text-2xl font-bold">{user.name}</h2>

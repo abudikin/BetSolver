@@ -1,15 +1,13 @@
-name: CI/CD Pipeline
+name: Build, Test and Deploy
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
+    
     services:
       postgres:
         image: postgres:14
@@ -20,29 +18,56 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
-    env:
-      DATABASE_HOST: localhost
-      DATABASE_PORT: 5432
-      DATABASE_USER: nestuser
-      DATABASE_PASSWORD: nestpass
-      DATABASE_NAME: nestdb
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Use Node.js
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
-
+          
       - name: Install dependencies
-        run: npm install
-
+        run: npm ci
+          
       - name: Run tests
-        run: npm run test:ci
+        run: npm run test
+          
+      - name: Build Docker image
+        run: docker build -t nestjs-app .
+          
+      - name: Save Docker image
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-image
+          path: /tmp/nestjs-app.tar
+          if-no-files-found: error
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Docker image
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-image
+          path: /tmp
+          
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+          
+      - name: Deploy to Beget
+        run: |
+          scp -r ./.github/docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/app/
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            cd /home/${{ secrets.SSH_USER }}/app &&
+            docker-compose down &&
+            docker-compose up -d
+          "
