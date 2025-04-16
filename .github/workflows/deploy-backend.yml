@@ -1,14 +1,15 @@
-name: Build, Test and Deploy Nest.js to Beget
+name: Deploy Backend to Beget
 
 on:
   push:
     branches: [main]
     paths:
       - 'src/backend/**'
-      - '.github/workflows/main.yml'
+      - '.github/workflows/deploy-backend.yml'
       - 'docker-compose.yml'
+
 jobs:
-  build-and-test:
+  build-and-deploy:
     runs-on: ubuntu-latest
     
     services:
@@ -27,18 +28,24 @@ jobs:
           --health-retries 5
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
         
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: 'npm'
+          cache-dependency-path: 'src/backend/package-lock.json'
           
       - name: Install dependencies
         working-directory: ./src/backend
-        run: npm ci
+        run: |
+          if [ -f "package-lock.json" ]; then
+            npm ci
+          else
+            npm install
+          fi
           
       - name: Run tests
         working-directory: ./src/backend
@@ -46,32 +53,20 @@ jobs:
           
       - name: Build Docker image
         working-directory: ./src/backend
+        run: docker build -t backend .
+          
+      - name: Login to GitHub Packages
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Push to GitHub Packages
+        working-directory: ./src/backend
         run: |
-          docker build -t nestjs-backend .
-          docker save nestjs-backend -o nestjs-backend.tar
-          
-      - name: Upload Docker image
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-image
-          path: src/backend/nestjs-backend.tar
-          retention-days: 1
-
-  deploy:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Download Docker image
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-image
-          path: .
-          
-      - name: Load Docker image
-        run: docker load -i src/backend/nestjs-backend.tar
+          docker tag backend ghcr.io/${{ github.repository_owner }}/backend:latest
+          docker push ghcr.io/${{ github.repository_owner }}/backend:latest
           
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
@@ -79,21 +74,12 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
           
-      - name: Prepare deployment files
+      - name: Deploy to Beget
         run: |
-          mkdir -p deploy
-          cp docker-compose.yml deploy/
-          cp -r src/backend/.env* deploy/ || echo "No .env files found"
-          
-      - name: Copy files to server
-        run: |
-          scp -r deploy/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/app/
-          
-      - name: Deploy application
-        run: |
+          scp docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/app/
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
             cd /home/${{ secrets.SSH_USER }}/app &&
-            docker-compose down &&
             docker-compose pull &&
+            docker-compose down &&
             docker-compose up -d
           "
