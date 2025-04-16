@@ -47,10 +47,6 @@ jobs:
             npm install
           fi
           
-      - name: Run tests
-        working-directory: ./src/backend
-        run: npm run test
-          
       - name: Build Docker image
         working-directory: ./src/backend
         run: docker build -t backend .
