@@ -1,4 +1,4 @@
-name: CI/CD for Vite + React
+name: Docker Deploy to Beget
 
 on:
   push:
@@ -7,49 +7,40 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: 🏗️ Checkout repository
-        uses: actions/checkout@v3
+      # 1. Клонируем репозиторий
+      - name: 🏷️ Checkout code
+        uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'
-
-      - name: 📦 Install dependencies
-        run: npm install
-        working-directory: ./src/client
-        
-      - name: 🔍 Lint
-        run: npm run lint
-        working-directory: ./src/client
-
-      - name: 🔨 Build project
-        run: npm run build
-        working-directory: ./src/client
-
-      - name: 🐳 Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-
-      - name: 🐳 Build and push Docker image
+      # 2. Собираем Docker-образ
+      - name: 🐳 Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/betsolver-client:latest ./src/client
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/betsolver-client:latest
+          cd src/client
+          docker build -t betsolver-client:latest .
 
-      - name: 🔒 Setup SSH
+      # 3. Сохраняем образ в .tar (чтобы передать на сервер)
+      - name: 💾 Save Docker image
+        run: |
+          cd src/client
+          docker save -o betsolver-client.tar betsolver-client:latest
+          ls -lh
+
+      # 4. Настраиваем SSH-ключ для Beget
+      - name: 🔑 Add SSH key
         uses: shimataro/ssh-key-action@v2
         with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.BEGET_SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
-      - name: 🚀 Deploy to server
+      # 5. Копируем образ на сервер и запускаем
+      - name: 🚀 Deploy to Beget
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/betsolver-client:latest
+          scp -o StrictHostKeyChecking=no src/client/betsolver-client.tar ${{ secrets.BEGET_USER }}@${{ secrets.BEGET_HOST }}:/tmp/
+          ssh -o StrictHostKeyChecking=no ${{ secrets.BEGET_USER }}@${{ secrets.BEGET_HOST }} "
+            docker load -i /tmp/betsolver-client.tar
             docker stop betsolver-client || true
             docker rm betsolver-client || true
-            docker run -d --name betsolver-client -p 3000:80 ${{ secrets.DOCKER_HUB_USERNAME }}/betsolver-client:latest
+            docker run -d --name betsolver-client -p 3000:80 betsolver-client:latest
+            rm /tmp/betsolver-client.tar
           "
