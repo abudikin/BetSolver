@@ -7,21 +7,21 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: BetSolver
     steps:
-      - name: 🧾 Клонируем репозиторий
+      - name: 🧹 Очистка
         uses: actions/checkout@v3
 
-      - name: 🟢 Устанавливаем Node.js
+      - name: 🟢 Установка Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '22'
 
-      - name: 📦 Устанавливаем зависимости
+      - name: 📦 Установка зависимостей
         run: npm install
         working-directory: src/client
         
@@ -33,3 +33,27 @@ jobs:
         run: npm run build
         working-directory: src/client
 
+      - name: 🐳 Сборка Docker образа
+        run: docker build -t betsolver-client .
+        working-directory: src/client
+
+      - name: 📦 Сохранение образа
+        run: docker save -o client-image.tar betsolver-client
+
+      - name: 🔒 Установка SSH ключа
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: 🚀 Деплой на сервер
+        run: |
+          scp -o StrictHostKeyChecking=no client-image.tar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            docker load -i /tmp/client-image.tar
+            docker stop betsolver-client || true
+            docker rm betsolver-client || true
+            docker run -d --name betsolver-client -p 3000:80 betsolver-client
+            rm /tmp/client-image.tar
+          "
+        working-directory: src/client
