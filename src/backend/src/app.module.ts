@@ -9,6 +9,7 @@ import { Dispute } from './entities/dispute.entity';
 import { DisputeParticipant } from './entities/disputeparticipant.entity';
 import { Notification } from './entities/notification.entity';
 import { Evidence } from './entities/evidence.entity';
+import { DisputesModule } from 'disputes/disputes.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { Evidence } from './entities/evidence.entity';
       synchronize: true,
     }),
     AuthModule,
+    DisputesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

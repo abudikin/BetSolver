@@ -1,30 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-
-const disputes = [
-  {
-    id: 1,
-    title: "Кто быстрее пробежит 5 км?",
-    status: "Активен",
-    participants: 3,
-  },
-  {
-    id: 2,
-    title: "Сможет ли Петя выучить React за 1 месяц?",
-    status: "Завершён",
-    participants: 2,
-  },
-  {
-    id: 3,
-    title: "Кто выиграет в шахматы?",
-    status: "Активен",
-    participants: 4,
-  },
-];
+import axios from "axios";
 
 const DisputesList = () => {
   const navigate = useNavigate();
+  const [disputes, setDisputes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchDisputes = async () => {
+      try {
+        const response = await axios.get("http://localhost:3030/disputes", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setDisputes(response.data);
+      } catch (error) {
+        console.error("Ошибка при загрузке споров:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDisputes();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 text-white">
@@ -38,25 +40,31 @@ const DisputesList = () => {
           Список споров
         </motion.h1>
 
-        {/* Список споров */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {disputes.map((dispute) => (
-            <motion.div
-              key={dispute.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-gray-800 bg-opacity-50 p-6 rounded-xl backdrop-blur-sm border border-gray-700 cursor-pointer hover:bg-opacity-75 transition"
-              onClick={() => navigate(`/dispute/${dispute.id}`)}
-            >
-              <h2 className="text-xl font-bold">{dispute.title}</h2>
-              <p className="text-gray-400">Статус: {dispute.status}</p>
-              <p className="text-gray-400">
-                Участников: {dispute.participants}
-              </p>
-            </motion.div>
-          ))}
-        </div>
+        {/* Лоадер или список */}
+        {loading ? (
+          <p className="text-center text-gray-400">Загрузка споров...</p>
+        ) : disputes.length === 0 ? (
+          <p className="text-center text-gray-400">Споры не найдены.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {disputes.map((dispute) => (
+              <motion.div
+                key={dispute.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="bg-gray-800 bg-opacity-50 p-6 rounded-xl backdrop-blur-sm border border-gray-700 cursor-pointer hover:bg-opacity-75 transition"
+                onClick={() => navigate(`/dispute/${dispute.id}`)}
+              >
+                <h2 className="text-xl font-bold">{dispute.title}</h2>
+                <p className="text-gray-400">Статус: {dispute.status}</p>
+                <p className="text-gray-400">
+                  Участников: {dispute.participants?.length ?? 0}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         {/* Кнопка назад */}
         <div className="text-center mt-8">

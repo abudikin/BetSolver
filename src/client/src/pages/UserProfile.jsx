@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../store"; 
 import axios from "axios";
 
 const UserProfile = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch(); 
 
-  const { token, userId } = useSelector((state) => state.user);
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
 
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`http://5.35.125.167:3030/users/${userId}`, {
+        const response = await axios.get(`http://localhost:3030/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -29,17 +27,19 @@ const UserProfile = () => {
 
     if (userId && token) {
       fetchUser();
+    } else {
+      navigate("/login");
     }
-  }, [userId, token]);
+  }, [userId, token, navigate]);
 
   const handleEditProfile = () => {
     navigate("/edit");
   };
 
-
   const handleLogout = () => {
-    dispatch(logout());
-    navigate("/"); 
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    navigate("/");
   };
 
   if (!user) {
@@ -58,7 +58,6 @@ const UserProfile = () => {
         transition={{ duration: 0.5 }}
         className="bg-gray-800 bg-opacity-50 p-8 rounded-xl shadow-lg backdrop-blur-sm border border-gray-700 text-center"
       >
-
         <h2 className="text-2xl font-bold">{user.name}</h2>
         <p className="text-gray-300">{user.email}</p>
 

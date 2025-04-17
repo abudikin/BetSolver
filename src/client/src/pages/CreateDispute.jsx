@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-
-const categories = ["Финансовый", "Юридический", "Технический", "Личный"];
+import axios from "axios";
 
 const CreateDispute = () => {
   const {
@@ -12,15 +11,33 @@ const CreateDispute = () => {
   } = useForm();
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
-
+  const token = localStorage.getItem("token");
   const onSubmit = async (data) => {
     setErrorMsg("");
 
     try {
-      console.log("Отправка данных:", data);
+
+      // Преобразуем строку даты в ISO-формат, если нужно
+      const payload = {
+        ...data,
+        deadline: data.deadline ? new Date(data.deadline).toISOString() : undefined,
+      };
+
+      const response = await axios.post(
+        "http://localhost:3030/disputes",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Спор создан:", response.data);
       navigate("/disputes");
     } catch (error) {
-      setErrorMsg("Ошибка при создании спора.", error);
+      console.error(error);
+      setErrorMsg("Ошибка при создании спора.");
     }
   };
 
@@ -43,28 +60,30 @@ const CreateDispute = () => {
           )}
 
           <textarea
-            {...register("description", { required: "Введите описание спора" })}
+            {...register("description", {
+              required: "Введите описание спора",
+            })}
             placeholder="Описание"
             className="w-full p-2 bg-gray-700 border border-gray-600 rounded h-20"
           />
           {errors.description && (
-            <p className="text-red-400 text-sm">{errors.description.message}</p>
+            <p className="text-red-400 text-sm">
+              {errors.description.message}
+            </p>
           )}
 
-          <select
-            {...register("category", { required: "Выберите категорию" })}
+          <input
+            type="text"
+            {...register("stake")}
+            placeholder="Ставка (например: ужин, деньги, уважение)"
             className="w-full p-2 bg-gray-700 border border-gray-600 rounded"
-          >
-            <option value="">Выберите категорию</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-          {errors.category && (
-            <p className="text-red-400 text-sm">{errors.category.message}</p>
-          )}
+          />
+
+          <input
+            type="date"
+            {...register("deadline")}
+            className="w-full p-2 bg-gray-700 border border-gray-600 rounded"
+          />
 
           <button
             type="submit"
