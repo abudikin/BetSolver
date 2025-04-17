@@ -15,7 +15,7 @@ const LoginPage = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch("http://localhost:3010/auth/login", {
+      const response = await fetch("http://localhost:3020/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

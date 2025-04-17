@@ -15,7 +15,7 @@ const RegisterPage = () => {
       console.log("Register Data:", data);
 
       // Отправка данных на сервер
-      const response = await fetch("http://localhost:3010/auth/register", {
+      const response = await fetch("http://localhost:3020/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
