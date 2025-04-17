@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from 'auth/auth.service';
 import { UsersService } from '../users/users.service';
-import { User } from '../entities/user.entity';
+import { User } from '../../entities/user.entity';
 import { RegisterDto } from 'auth/dto/register.dto';
 
 describe('AuthService', () => {
@@ -63,7 +63,7 @@ describe('AuthService', () => {
 
       expect(usersService.findOneByEmail).toHaveBeenCalledWith('test@example.com');
       expect(bcrypt.compare).toHaveBeenCalledWith('password', 'hashedpassword');
-      
+
       // Убедимся, что password исключен из результата
       const { password, ...expectedResult } = mockUser;
       expect(result).toEqual(expectedResult);

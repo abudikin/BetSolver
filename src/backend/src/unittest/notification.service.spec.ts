@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification } from '../entities/notification.entity';
-import { User } from '../entities/user.entity';
+import { User } from '../../entities/user.entity';
 import { NotificationsService } from '../notifications/notifications.service';
 
 describe('NotificationsService', () => {

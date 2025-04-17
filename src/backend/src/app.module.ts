@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { User } from './entities/user.entity';
+import { User } from './../entities/user.entity';
 import { Dispute } from './entities/dispute.entity';
 import { DisputeParticipant } from './entities/disputeparticipant.entity';
 import { Notification } from './entities/notification.entity';
@@ -28,4 +28,4 @@ import { Evidence } from './entities/evidence.entity';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
