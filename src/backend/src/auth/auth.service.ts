@@ -30,11 +30,15 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterDto) {
+    const existingUser = await this.usersService.findOneByEmail(registerDto.email);
+    if (existingUser) {
+      throw new Error('Пользователь с таким email уже существует');
+    }
+
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
     return this.usersService.create({
       ...registerDto,
       password: hashedPassword,
-
     });
   }
 }
