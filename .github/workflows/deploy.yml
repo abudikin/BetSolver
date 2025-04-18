@@ -1,31 +1,35 @@
-name: CI/CD for Vite + React
+name: Deploy to VPS via SSH Password
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: BetSolver
+
+    env:
+      SSH_USER: root
+      SSH_HOST: 5.35.125.167
+      SSH_PASS: zm27V4M8cJpk4BAj5H
+      PROJECT_DIR: /home/BetSolver/src/client
+
     steps:
-      - name: 🧾 Клонируем репозиторий
-        uses: actions/checkout@v3
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-      - name: 🟢 Устанавливаем Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'
+    - name: Install sshpass
+      run: sudo apt-get update && sudo apt-get install -y sshpass
 
-      - name: 📦 Устанавливаем зависимости
-        run: npm install
-        working-directory: src/client
-        
-      - name: 🔨 Сборка проекта
-        run: npm run build
-        working-directory: src/client
+    - name: Rsync project to VPS
+      run: |
+        sshpass -p "$SSH_PASS" rsync -avz --exclude=node_modules --exclude=.git ./ $SSH_USER@$SSH_HOST:$PROJECT_DIR
 
+    - name: Build and restart Docker container
+      run: |
+        sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST <<EOF
+          cd $PROJECT_DIR
+          docker compose down || true
+          docker compose up -d --build
+        EOF
