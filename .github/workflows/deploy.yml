@@ -24,7 +24,10 @@ jobs:
 
     - name: Rsync project to VPS
       run: |
-        sshpass -p "$SSH_PASS" rsync -avz --exclude=node_modules --exclude=.git ./ $SSH_USER@$SSH_HOST:$PROJECT_DIR
+        sshpass -p "$SSH_PASS" rsync -avz \
+          -e "ssh -o StrictHostKeyChecking=no" \
+          --exclude=node_modules --exclude=.git ./ \
+          $SSH_USER@$SSH_HOST:$PROJECT_DIR
 
     - name: Build and restart Docker container
       run: |
