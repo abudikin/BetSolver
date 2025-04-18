@@ -24,7 +24,7 @@ const CreateDispute = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:3030/disputes",
+        "http://5.35.125.167:3030/disputes",
         payload,
         {
           headers: {

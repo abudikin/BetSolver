@@ -21,7 +21,7 @@ const EditProfile = () => {
     }
 
     // Получаем текущие данные пользователя
-    fetch(`http://localhost:3030/users/${userId}`, {
+    fetch(`http://5.35.125.167:3030/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -56,7 +56,7 @@ const EditProfile = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3030/users/${userId}`, {
+      const response = await fetch(`http://5.35.125.167:3030/users/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -115,7 +115,7 @@ const EditProfile = () => {
             onChange={handleChange}
             className="p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Новый пароль"
-            
+
           />
           <motion.button
             type="submit"

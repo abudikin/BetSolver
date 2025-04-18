@@ -13,7 +13,7 @@ const LoginPage = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch("http://localhost:3030/auth/login", {
+      const response = await fetch("http://5.35.125.167:3030/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,8 +28,8 @@ const LoginPage = () => {
       const result = await response.json();
       console.log("Login success:", result);
 
-    localStorage.setItem("token", result.access_token);
-    localStorage.setItem("userId", result.user_id);
+      localStorage.setItem("token", result.access_token);
+      localStorage.setItem("userId", result.user_id);
 
       navigate("/home");
     } catch (error) {

@@ -21,7 +21,7 @@ const DisputeDetails = () => {
   useEffect(() => {
     const fetchDispute = async () => {
       try {
-        const res = await fetch(`http://localhost:3030/disputes/${id}`, {
+        const res = await fetch(`http://5.35.125.167:3030/disputes/${id}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -46,7 +46,7 @@ const DisputeDetails = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch(`http://localhost:3030/users`, {
+        const res = await fetch(`http://5.35.125.167:3030/users`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -70,7 +70,7 @@ const DisputeDetails = () => {
     setSelectedUserId(selectedId);
 
     try {
-      const res = await fetch(`http://localhost:3030/disputes/${id}`, {
+      const res = await fetch(`http://5.35.125.167:3030/disputes/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -100,7 +100,7 @@ const DisputeDetails = () => {
 
   const confirmWinner = async () => {
     try {
-      const res = await fetch(`http://localhost:3030/disputes/${id}/complete`, {
+      const res = await fetch(`http://5.35.125.167:3030/disputes/${id}/complete`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

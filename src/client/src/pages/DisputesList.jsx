@@ -9,15 +9,15 @@ const DisputesList = () => {
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
-   const statusTranslations = {
-  pending: "В ожидании",
-  active: "Активен",
-  completed: "Завершён",
-};
+  const statusTranslations = {
+    pending: "В ожидании",
+    active: "Активен",
+    completed: "Завершён",
+  };
   useEffect(() => {
     const fetchDisputes = async () => {
       try {
-        const response = await axios.get(`http://localhost:3030/disputes/${userId}/list`, {
+        const response = await axios.get(`http://5.35.125.167:3030/disputes/${userId}/list`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
