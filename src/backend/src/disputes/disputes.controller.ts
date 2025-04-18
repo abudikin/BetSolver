@@ -26,6 +26,13 @@ export class DisputesController {
   findOne(@Param('id') id: string) {
     return this.disputesService.findOne(+id);
   }
+  /*Поиск списка споров по клиенту*/ 
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/list')
+  findListDisputer(@Param('id') id: string) {
+    return this.disputesService.findListDispute(+id);
+  }
+
 
   @UseGuards(JwtAuthGuard)
   @Put(':id')

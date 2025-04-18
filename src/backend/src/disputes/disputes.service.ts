@@ -65,6 +65,18 @@ export class DisputesService {
     await this.disputesRepository.delete(id);
   }
 
+
+  async findListDispute(id: number): Promise<Dispute[] | null> {
+    return this.disputesRepository.find({
+      where: {
+        creator: { id: id } // Ищем споры, где creator.id = clientId
+      },
+      relations: ['participants', 'evidence'] // При необходимости подгружаем связи
+    })
+  }
+
+
+
   async addParticipant(disputeId: number, userId: number, role: 'participant' | 'arbitrator'): Promise<DisputeParticipant> {
     const dispute = await this.disputesRepository.findOne({ where: { id: disputeId } });
     const user = await this.usersRepository.findOne({ where: { id: userId } });
