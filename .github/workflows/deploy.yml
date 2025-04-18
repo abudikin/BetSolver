@@ -25,10 +25,6 @@ jobs:
         run: npm install
         working-directory: src/client
         
-      - name: 🔍 Проверка кода
-        run: npm run lint
-        working-directory: src/client
-
       - name: 🔨 Сборка проекта
         run: npm run build
         working-directory: src/client

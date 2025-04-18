@@ -63,16 +63,8 @@ const UserProfile = () => {
 
         <div className="mt-4 grid grid-cols-3 gap-4">
           <div className="text-center">
-            <span className="text-xl font-bold">{user.disputes.length}</span>
+            <span className="text-xl font-bold">{user.createdDisputes.length}</span>
             <p className="text-gray-400 text-sm">Споры</p>
-          </div>
-          <div className="text-center">
-            <span className="text-xl font-bold">{user.wins}</span>
-            <p className="text-gray-400 text-sm">Победы</p>
-          </div>
-          <div className="text-center">
-            <span className="text-xl font-bold">{user.losses}</span>
-            <p className="text-gray-400 text-sm">Поражения</p>
           </div>
         </div>
 

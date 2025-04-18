@@ -8,11 +8,16 @@ const DisputesList = () => {
   const [disputes, setDisputes] = useState([]);
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
-
+  const userId = localStorage.getItem("userId");
+   const statusTranslations = {
+  pending: "В ожидании",
+  active: "Активен",
+  completed: "Завершён",
+};
   useEffect(() => {
     const fetchDisputes = async () => {
       try {
-        const response = await axios.get("http://localhost:3030/disputes", {
+        const response = await axios.get(`http://localhost:3030/disputes/${userId}/list`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -57,10 +62,8 @@ const DisputesList = () => {
                 onClick={() => navigate(`/dispute/${dispute.id}`)}
               >
                 <h2 className="text-xl font-bold">{dispute.title}</h2>
-                <p className="text-gray-400">Статус: {dispute.status}</p>
-                <p className="text-gray-400">
-                  Участников: {dispute.participants?.length ?? 0}
-                </p>
+                <p className="text-gray-400">Статус: {statusTranslations[dispute.status] || dispute.status}</p>
+
               </motion.div>
             ))}
           </div>
